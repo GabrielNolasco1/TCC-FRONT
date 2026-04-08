@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/* 1. Definição das variáveis de cores */
+:root {
+  --brand-bg: #ffffff;
+  --brand-surface: #f4f4f5;
+  --brand-primary: #4f46e5;
+  --brand-text: #09090b;
+  --brand-muted: #71717a;
+  --brand-error: #e11d48;
+}
+
+.dark {
+  --brand-bg: #18181b;
+  --brand-surface: #27272a;
+  --brand-primary: #6366f1;
+  --brand-text: #f4f4f5;
+  --brand-muted: #a1a1aa;
+  --brand-error: #f43f5e;
+}
+
+/* 2. Mapeamento para classes do Tailwind */
+@theme {
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-text: var(--brand-text);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-error: var(--brand-error);
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-text antialiased transition-colors duration-300;
+    font-family: 'Inter', sans-serif;
+  }
+
+  input {
+    @apply bg-brand-surface border border-brand-muted/20 p-3 rounded-xl text-brand-text 
+           outline-none focus:ring-2 focus:ring-brand-primary/40 transition-all;
+  }
+
+  .btn-primary {
+    @apply bg-brand-primary text-white p-3 rounded-xl font-bold uppercase tracking-tight
+           hover:brightness-110 shadow-lg shadow-brand-primary/10 
+           transition-all active:scale-95 disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply bg-brand-surface border border-brand-muted/20 text-brand-text p-3 rounded-xl 
+           font-medium hover:bg-brand-muted/10 transition-all active:scale-95;
+  }
+}
