@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   }),
 }));
 
-export const api = axios.create({ baseURL: 'https://tcc-code.onrender.com' });
+export const api = axios.create({ baseURL: 'https://req-flow.online' });
 
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().token;
