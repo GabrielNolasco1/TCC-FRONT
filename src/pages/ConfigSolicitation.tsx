@@ -70,6 +70,10 @@ export function ConfigSolicitation() {
   const [isSavingFlow, setIsSavingFlow] = useState(false);
   const [error, setError] = useState('');
 
+  // Estados para Criar Nova Solicitação
+  const [isCreatingSol, setIsCreatingSol] = useState(false);
+  const [newSolicitationName, setNewSolicitationName] = useState('');
+
   // Estados de Configuração (Formulário/Fluxo)
   const [configApproval, setConfigApproval] = useState<ConfigApproval>({ necessaryApproverLevel: null, ifNotHaveApproverLevel: null });
   const [flowApprovals, setFlowApprovals] = useState<FlowApproval[]>([]);
@@ -80,7 +84,7 @@ export function ConfigSolicitation() {
     question: '', name: '', type: 'text', isRequired: true, optionsText: '', order: 1 
   });
 
-  // Busca inicial de categorias e usuários (Os usuários já vêm aqui!)
+  // Busca inicial de categorias e usuários
   const fetchInitialData = useCallback(async () => {
     try {
       const [resSol, resUsers] = await Promise.all([
@@ -115,8 +119,7 @@ export function ConfigSolicitation() {
         ifNotHaveApproverLevel: configRes.data?.ifNotHaveApproverLevel ?? null
       });
 
-      // 💡 O TRUQUE DO NOME BONITINHO FICA AQUI:
-      // Cruzamos o userId que vem do back com a usersList que já baixamos!
+      // Cruzamos o userId que vem do back com a usersList
       const flowsWithNames = (flowRes.data || []).map(flow => {
         const foundUser = usersList.find(u => u.id === flow.userId);
         return {
@@ -138,6 +141,25 @@ export function ConfigSolicitation() {
     setSelectedSol(sol);
     setActiveSectionId(null);
     fetchStructureAndFlow(sol.id);
+  };
+
+  // --- LÓGICA DE CRIAÇÃO DA SOLICITAÇÃO ---
+  const handleCreateSolicitation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSolicitationName.trim()) return;
+    
+    try {
+      // Agora enviamos o nome E o areaId do usuário logado para agradar o Back-end!
+      await api.post('/solicitations', { 
+        name: newSolicitationName,
+        areaId: user?.areaId 
+      });
+      setNewSolicitationName('');
+      setIsCreatingSol(false);
+      await fetchInitialData(); // Recarrega a barra lateral
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
   };
 
   // --- LÓGICA DE CAMPOS (TAB FORM) ---
@@ -261,11 +283,46 @@ export function ConfigSolicitation() {
       )}
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-8 min-h-0">
-        {/* SIDEBAR: APENAS LISTAGEM */}
+        
+        {/* SIDEBAR ATUALIZADA: LISTAGEM E CRIAÇÃO */}
         <aside className="lg:col-span-1 flex flex-col gap-6 overflow-y-auto pr-2 custom-scrollbar">
           <div className="flex flex-col gap-2">
-            <h3 className="text-xs font-black text-brand-muted uppercase tracking-widest px-2 mb-2">Selecione uma Categoria</h3>
-            {solicitations.length === 0 ? (
+            
+            {/* Cabeçalho da Sidebar com Botão de Adicionar */}
+            <div className="flex items-center justify-between px-2 mb-2">
+              <h3 className="text-xs font-black text-brand-muted uppercase tracking-widest">Serviços</h3>
+              <button 
+                onClick={() => setIsCreatingSol(!isCreatingSol)} 
+                className="p-1 rounded-md text-brand-primary hover:bg-brand-primary/10 transition-colors"
+                title="Criar novo serviço"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+
+            {/* Formulário de Criação (Aparece ao clicar no +) */}
+            {isCreatingSol && (
+              <form onSubmit={handleCreateSolicitation} className="mb-4 flex flex-col gap-2 p-3 bg-brand-surface/40 border border-brand-primary/30 rounded-2xl animate-in fade-in zoom-in-95 shadow-lg">
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  placeholder="Nome (Ex: Férias)"
+                  value={newSolicitationName}
+                  onChange={e => setNewSolicitationName(e.target.value)}
+                  className="w-full text-sm p-2 bg-brand-bg rounded-xl border border-white/5 outline-none focus:border-brand-primary text-brand-text"
+                />
+                <div className="flex justify-end gap-2 mt-1">
+                  <button type="button" onClick={() => setIsCreatingSol(false)} className="text-[10px] uppercase font-bold text-brand-muted hover:text-brand-text px-2 py-1">Cancelar</button>
+                  <button type="submit" className="text-[10px] uppercase font-bold text-white bg-brand-primary px-3 py-1 rounded-lg hover:bg-brand-primary/90 flex items-center gap-1">
+                    <Save size={12} /> Salvar
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Lista de Solicitações Existentes */}
+            {solicitations.length === 0 && !isCreatingSol ? (
                <p className="text-xs text-brand-muted italic px-2">Nenhum serviço configurado na sua área ainda.</p>
             ) : (
               solicitations.map(sol => (
