@@ -21,11 +21,21 @@ export function Login() {
     } catch (err) {
       const axiosError = err as AxiosError<ApiError>;
       const message = axiosError.response?.data?.message;
+      
+      // 1. Tratamento para usuário que ainda não validou o e-mail (2FA)
       if (message === "USER_NOT_VALIDATED") {
         setRegistrationEmail(email);
         navigate('/verify');
         return;
       }
+
+      // 2. Tratamento para usuário barrado na Portaria do MASTER
+      if (message === "USER_NOT_APPROVED") {
+        setError('Uma notificação foi enviada para o gestor do sistema. Aguarde para sua liberação.');
+        return;
+      }
+
+      // 3. Fallback genérico para senha incorreta ou e-mail inexistente
       setError(message || 'Credenciais inválidas.');
     }
   };
@@ -45,6 +55,7 @@ export function Login() {
           <p className="text-brand-muted text-sm font-medium">Gestão de Solicitações</p>
         </header>
         
+        {/* Mostra o erro de forma amigável no topo do form */}
         {error && <div className="bg-brand-error/10 border-l-2 border-brand-error p-3 mb-6 text-brand-error text-xs font-bold text-center">{error}</div>}
 
         <form onSubmit={handleLogin} className="flex flex-col gap-6">

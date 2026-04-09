@@ -6,11 +6,12 @@ import { Register } from './pages/Register';
 import { TokenVerification } from './pages/TokenVerification';
 import { Home } from './pages/Home';
 import { Areas } from './pages/Areas';
-import { Users } from './pages/Users'; // Importação da nova página
+import { Users } from './pages/Users';
 import { MainLayout } from './components/MainLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { CreateRequest } from './pages/CreateRequest';
 import { ConfigSolicitation } from './pages/ConfigSolicitation';
+import { Management } from './pages/Management';
 
 const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
@@ -24,9 +25,10 @@ const router = createBrowserRouter([
         children: [
           { path: "/", element: <Home /> },
           { path: "/areas", element: <Areas /> },
-          { path: "/users", element: <Users /> }, // Rota da Portaria
+          { path: "/users", element: <Users /> },
           { path: "/create-request", element: <CreateRequest /> },
           { path: "/config", element: <ConfigSolicitation /> },
+          { path: "/management", element: <Management /> },
         ]
       }
     ]

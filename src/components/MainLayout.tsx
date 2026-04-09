@@ -1,7 +1,8 @@
 import { Link, Outlet } from 'react-router-dom';
 import { 
   PlusCircle, Layers, LayoutDashboard, Users, 
-  LogOut, Moon, Sun, Settings 
+  LogOut, Moon, Sun, Settings, 
+  Filter
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { AccessRole } from '../types/api';
@@ -38,6 +39,7 @@ export function MainLayout() {
           {isAdminOrMaster && (
             <>
               <div className="h-px bg-white/5 my-2 mx-2 shrink-0" />
+              <NavItem to="/management" icon={<Filter size={22} />} label="Gestão de Pedidos" />
               <NavItem to="/config" icon={<Settings size={22} />} label="Configurar Fluxos" />
             </>
           )}
